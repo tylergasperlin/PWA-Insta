@@ -1,7 +1,8 @@
 self.addEventListener('install', function(event) {
     console.log('[Service worker] Installing service worker...' , event)
     event.waitUntil(
-    caches.open('static') //can name static or whatever you want
+        //when versioning caches you want to use a new name so the new cache does not interfere with the currently used content
+    caches.open('static-v3') //can name static or whatever you want
     .then(function(cache){
         console.log('[Service worker] Precaching app shell')
         //this is what caches content. 
@@ -28,6 +29,21 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('activate', function(event) {
     console.log('[Service worker] Activating service worker...' , event)
+    event.waitUntil(
+        //get all keys of caches
+        //clean up cache. Delete caches not equal to the current cache
+        caches.keys()
+        .then(function(keyList){
+            return Promise.all(keyList.map(function(key) {
+                if(key !== 'static-v3' && key !== 'dynamic'){
+                    console.log('[Service worker] Removing old cache', key);
+                    return caches.delete(key)
+                }
+
+            }));
+        })
+
+    )
     // return self.client.claim();
 })
 
@@ -49,7 +65,7 @@ self.addEventListener('fetch', function(event) {
                         })
                     })
                     .catch(function(err) {
-                        
+
                     })
                 }
             })
