@@ -1,8 +1,13 @@
+
+//Increment these any time there is a change to a cached file (not the service worker - service worker will reinstall for each change)
+let CACHE_STATIC_NAME = 'static-v4'
+let CACHE_DYNAMIC_NAME = 'dynamic-v2'
+
 self.addEventListener('install', function(event) {
     console.log('[Service worker] Installing service worker...' , event)
     event.waitUntil(
         //when versioning caches you want to use a new name so the new cache does not interfere with the currently used content
-    caches.open('static-v3') //can name static or whatever you want
+    caches.open(CACHE_STATIC_NAME) //can name static or whatever you want
     .then(function(cache){
         console.log('[Service worker] Precaching app shell')
         //this is what caches content. 
@@ -35,7 +40,7 @@ self.addEventListener('activate', function(event) {
         caches.keys()
         .then(function(keyList){
             return Promise.all(keyList.map(function(key) {
-                if(key !== 'static-v3' && key !== 'dynamic'){
+                if(key !== CACHE_STATIC_NAME && key !== CACHE_DYNAMIC_NAME){
                     console.log('[Service worker] Removing old cache', key);
                     return caches.delete(key)
                 }
@@ -58,7 +63,7 @@ self.addEventListener('fetch', function(event) {
                     return fetch(event.request)
                     .then(function(res){
                         //can call whatever we want - separate from the other cache
-                        return caches.open('dynamic')
+                        return caches.open(CACHE_DYNAMIC_NAME)
                         .then(function(cache){
                             cache.put(event.request.url, res.clone())
                                 return res
