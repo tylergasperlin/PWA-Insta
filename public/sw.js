@@ -1,6 +1,6 @@
 
 //Increment these any time there is a change to a cached file (not the service worker - service worker will reinstall for each change)
-let CACHE_STATIC_NAME = 'static-v7'
+let CACHE_STATIC_NAME = 'static-v8'
 let CACHE_DYNAMIC_NAME = 'dynamic-v2'
 
 self.addEventListener('install', function(event) {
@@ -65,6 +65,7 @@ self.addEventListener('fetch', function(event) {
                         //can call whatever we want - separate from the other cache
                         return caches.open(CACHE_DYNAMIC_NAME)
                         .then(function(cache){
+                            // Enable dynamic caching
                             cache.put(event.request.url, res.clone())
                                 return res
                         })
