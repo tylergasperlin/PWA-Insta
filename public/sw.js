@@ -53,33 +53,40 @@ self.addEventListener('activate', function(event) {
     // return self.client.claim();
 })
 
+// self.addEventListener('fetch', function(event) {
+//     event.respondWith(
+//         caches.match(event.request)
+//         //dont use catch here because the response comes back null if error
+//             .then(function(response){
+//                 if(response){
+//                     return response;
+//                 } else {
+//                     return fetch(event.request)
+//                     .then(function(res){
+//                         //can call whatever we want - separate from the other cache
+//                         return caches.open(CACHE_DYNAMIC_NAME)
+//                         .then(function(cache){
+//                             // Enable dynamic caching
+//                             cache.put(event.request.url, res.clone())
+//                                 return res
+//                         })
+//                     }) 
+//                     .catch(function(err) {
+//                         return caches.open(CACHE_STATIC_NAME)
+//                         .then(function(cache) {
+//                             return cache.match('/offline.html');
+//                         })
+//                     })
+//                 }
+//             })
+//     );
+// })
+
+
+// Cache only strategy 
 self.addEventListener('fetch', function(event) {
     event.respondWith(
         caches.match(event.request)
-        //dont use catch here because the response comes back null if error
-            .then(function(response){
-                if(response){
-                    return response;
-                } else {
-                    return fetch(event.request)
-                    .then(function(res){
-                        //can call whatever we want - separate from the other cache
-                        return caches.open(CACHE_DYNAMIC_NAME)
-                        .then(function(cache){
-                            // Enable dynamic caching
-                            cache.put(event.request.url, res.clone())
-                                return res
-                        })
-                    }) 
-                    .catch(function(err) {
-                        return caches.open(CACHE_STATIC_NAME)
-                        .then(function(cache) {
-                            return cache.match('/offline.html');
-                        })
-                    })
-                }
-            })
+
     );
 })
-
-
