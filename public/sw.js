@@ -53,18 +53,53 @@ self.addEventListener('activate', function(event) {
     //return self.client.claim();
 })
 
-
+//Cache then network with offline support 
+//Full control over resources
 self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.open(CACHE_DYNAMIC_NAME)
-        .then(function(cache) {
-            return fetch(event.request) //intercept all js requests
-            .then(function(res) {
-                cache.put(event.request, res.clone());
-                return res;
+    var url = 'https://httpbin.org/get';
+    //Cache then network strategy
+    //Use when you have connection and want to get data on screen quickly
+    if(event.request.url.indexOf(url) > -1) {
+        //fetch store and dont look if data is in cache already
+        event.respondWith(
+            caches.open(CACHE_DYNAMIC_NAME)
+            .then(function(cache) {
+                return fetch(event.request) //intercept all js requests
+                .then(function(res) {
+                    cache.put(event.request, res.clone());
+                    return res;
+                })
             })
-        })
-    );
+        );
+    } else {
+        // Cache with network fallback (cache first then network)
+        event.respondWith(
+            caches.match(event.request)
+            //dont use catch here because the response comes back null if error
+            .then(function(response){
+                if(response){
+                    return response;
+                } else {
+                    return fetch(event.request)
+                    .then(function(res){
+                        //can call whatever we want - separate from the other cache
+                        return caches.open(CACHE_DYNAMIC_NAME)
+                        .then(function(cache){
+                            // Enable dynamic caching
+                            cache.put(event.request.url, res.clone())
+                                return res
+                        })
+                    }) 
+                    .catch(function(err) {
+                        return caches.open(CACHE_STATIC_NAME)
+                        .then(function(cache) {
+                            return cache.match('/offline.html');
+                        })
+                    })
+                }
+            })
+        )
+    }
 })
 
 
