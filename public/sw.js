@@ -1,6 +1,6 @@
 
 //Increment these any time there is a change to a cached file (not the service worker - service worker will reinstall for each change)
-let CACHE_STATIC_NAME = 'static-v10'
+let CACHE_STATIC_NAME = 'static-v12'
 let CACHE_DYNAMIC_NAME = 'dynamic-v2'
 
 self.addEventListener('install', function(event) {
