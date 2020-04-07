@@ -19,6 +19,15 @@ let STATIC_FILES = [
     'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
 ];
 
+function isInArray(string, array) {
+    for(var i = 0; i < array.length; i ++) {
+        if(array[1] === string) {
+            return true;
+        }
+    }
+    return false;
+}
+
 self.addEventListener('install', function(event) {
     console.log('[Service worker] Installing service worker...' , event)
     event.waitUntil(
@@ -73,11 +82,12 @@ self.addEventListener('fetch', function(event) {
             })
         );
         //cache only strategy for statically cached files
-        //join all static files and check if url matches this
-    // } else if (new RegExp('\\b' + STATIC_FILES.join('\\b|\\b') + '\\b').test(event.request.url)) {
-    //     event.respondWith(
-    //         caches.match(event.request)
-    //     );
+        //this only works beecause we load static files into cache as worker is installed
+        //allows us to get static data without goiong to server
+    } else if (isInArray(event.request.url, STATIC_FILES)) {
+        event.respondWith(
+            caches.match(event.request)
+        );
      }
     else {
         // Cache with network fallback (cache first then network)
