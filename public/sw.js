@@ -18,10 +18,10 @@ let STATIC_FILES = [
     'https://fonts.googleapis.com/icon?family=Material+Icons',
     'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
 ];
-
+ 
 function isInArray(string, array) {
     var cachePath;
-    if (string.indexOf(self.origin) === 0) { // request targets domain where we serve the page from (i.e. NOT a CDN)
+    if (string.indexOf(self.origin) === 0) { // request targets domain where we serve the page from (i.e. NOT a CDN) a
       //console.log('matched ', string);
       cachePath = string.substring(self.origin.length); // take the part of the URL AFTER the domain (e.g. after localhost:8080)
     } else {
@@ -113,8 +113,9 @@ self.addEventListener('fetch', function(event) {
                     .catch(function(err) {
                         return caches.open(CACHE_STATIC_NAME)
                         .then(function(cache) {
-                            if(event.request.url.indexOf('/help')){
-                                return cache.match('/offline.html'); // here we apply a specific rule to this page. If help does not have css in cache it would be worthless
+                            // here we apply a specific rule to this page. If help does not have css in cache it would be worthless
+                            if(event.request.headers.get('accept').includes('text/html')) {
+                                return cache.match('/offline.html'); 
                             }
                         })
                     })
