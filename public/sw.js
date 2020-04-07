@@ -1,7 +1,23 @@
 
 //Increment these any time there is a change to a cached file (not the service worker - service worker will reinstall for each change)
-let CACHE_STATIC_NAME = 'static-v13'
+let CACHE_STATIC_NAME = 'static-v18'
 let CACHE_DYNAMIC_NAME = 'dynamic-v2'
+let STATIC_FILES = [
+    '/',
+    '/index.html',
+    '/offline.html',
+    '/src/js/app.js',
+    '/src/js/feed.js',
+    '/src/js/promise.js',
+    '/src/js/fetch.js',
+    '/src/js/material.min.js',
+    '/src/css/app.css',
+    '/src/css/feed.css',
+    '/src/images/main-image.jpg',
+    'https://fonts.googleapis.com/css?family=Roboto:400,700',
+    'https://fonts.googleapis.com/icon?family=Material+Icons',
+    'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
+];
 
 self.addEventListener('install', function(event) {
     console.log('[Service worker] Installing service worker...' , event)
@@ -13,23 +29,7 @@ self.addEventListener('install', function(event) {
         //this is what caches content. 
         //think of these as requests not paths
         //needed to cache / so when user navigates to the main page we request the appropriate resource = index.html
-        cache.addAll([
-            '/',
-            '/index.html',
-            '/offline.html',
-            '/src/js/app.js',
-            '/src/js/feed.js',
-            '/src/js/promise.js',
-            '/src/js/fetch.js',
-            '/src/js/material.min.js',
-            '/src/css/app.css',
-            '/src/css/feed.css',
-            '/src/css/help.css',
-            '/src/images/main-image.jpg',
-            'https://fonts.googleapis.com/css?family=Roboto:400,700',
-            'https://fonts.googleapis.com/icon?family=Material+Icons',
-            'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
-        ])
+        cache.addAll(STATIC_FILES)
     }))
 })
 
@@ -57,6 +57,7 @@ self.addEventListener('activate', function(event) {
 //Full control over resources
 self.addEventListener('fetch', function(event) {
     var url = 'https://httpbin.org/get';
+    var staticAssets = [];
     //Cache then network strategy
     //Use when you have connection and want to get data on screen quickly
     if(event.request.url.indexOf(url) > -1) {
@@ -71,7 +72,14 @@ self.addEventListener('fetch', function(event) {
                 })
             })
         );
-    } else {
+        //cache only strategy for statically cached files
+        //join all static files and check if url matches this
+    // } else if (new RegExp('\\b' + STATIC_FILES.join('\\b|\\b') + '\\b').test(event.request.url)) {
+    //     event.respondWith(
+    //         caches.match(event.request)
+    //     );
+     }
+    else {
         // Cache with network fallback (cache first then network)
         event.respondWith(
             caches.match(event.request)
