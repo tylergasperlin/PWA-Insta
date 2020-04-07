@@ -93,7 +93,9 @@ self.addEventListener('fetch', function(event) {
                     .catch(function(err) {
                         return caches.open(CACHE_STATIC_NAME)
                         .then(function(cache) {
-                            return cache.match('/offline.html');
+                            if(event.request.url.indexOf('/help')){
+                                return cache.match('/offline.html'); // here we apply a specific rule to this page. If help does not have css in cache it would be worthless
+                            }
                         })
                     })
                 }
