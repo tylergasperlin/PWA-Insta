@@ -1,6 +1,6 @@
 
 //Increment these any time there is a change to a cached file (not the service worker - service worker will reinstall for each change)
-let CACHE_STATIC_NAME = 'static-v18'
+let CACHE_STATIC_NAME = 'static-v19'
 let CACHE_DYNAMIC_NAME = 'dynamic-v2'
 let STATIC_FILES = [
     '/',
@@ -18,6 +18,20 @@ let STATIC_FILES = [
     'https://fonts.googleapis.com/icon?family=Material+Icons',
     'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
 ];
+
+// clean up cache ~ limit cache items
+// function trimCache(cacheName, maxItems) {
+//     caches.open(cacheName)
+//     .then(function(cache) {
+//         return cache.keys()
+//         .then(function(keys) {
+//             if(keys.length > maxItems) {
+//                 cache.delete(keys[0])
+//                 .then(trimCache(cacheName, maxItems))
+//             }
+//         })
+//     })
+// }
  
 function isInArray(string, array) {
     var cachePath;
@@ -78,6 +92,7 @@ self.addEventListener('fetch', function(event) {
             .then(function(cache) {
                 return fetch(event.request) //intercept all js requests
                 .then(function(res) {
+                    //trimCache(CACHE_DYNAMIC_NAME, 15);
                     cache.put(event.request, res.clone());
                     return res;
                 })
@@ -105,6 +120,7 @@ self.addEventListener('fetch', function(event) {
                         //can call whatever we want - separate from the other cache
                         return caches.open(CACHE_DYNAMIC_NAME)
                         .then(function(cache){
+                            //trimCache(CACHE_DYNAMIC_NAME, 15);
                             // Enable dynamic caching
                             cache.put(event.request.url, res.clone())
                                 return res
