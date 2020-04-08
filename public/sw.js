@@ -81,7 +81,7 @@ self.addEventListener('activate', function(event) {
 //Cache then network with offline support 
 //Full control over resources
 self.addEventListener('fetch', function(event) {
-    var url = 'https://httpbin.org/get';
+    var url = 'https://pwa-gram-42a45.firebaseio.com/posts.json';
     var staticAssets = [];
     //Cache then network strategy
     //Use when you have connection and want to get data on screen quickly
